@@ -46,15 +46,21 @@ Welcome text
 
 ---
 
-# Treść
+# Agenda
 
 O czym w ogóle jest ta prezentacja
 
 ---
 
-# Authors
+# Autorzy
 
 Cośtam o nas
+
+---
+
+# Wprowadzenie
+
+Janek jest junior developerem
 
 ---
 
@@ -108,10 +114,44 @@ $ docker run -p 80:80 docker/getting-started
 
 ---
 
-# Code example
+# Demo 2 Konteneryzacja aplikacji backend
 
-```cs
-public class Asd {
-    public Asd(int a, int b) {}
-}
-```
+---
+
+# Demo 3 Konteneryzacja aplikacji frontend
+
+---
+
+# Kilka słów o docker-compose i orchestracji
+
+---
+
+# Demo 4 docker compose
+
+---
+
+# Napisać coś o rejestrach
+
+---
+
+# Demo 5 Opublikowanie obrazu
+
+---
+
+# Co to jest ACI, jakie są opcje wdrożenia
+
+---
+
+# Demo 6 Wdrożenie do Azure
+
+---
+
+# Kilka słów o CI/CD
+
+---
+
+# Demo 7 CI/CD dla aplikacji frontend/backend
+
+---
+
+# Najlepsze praktyki pisania obrazów
