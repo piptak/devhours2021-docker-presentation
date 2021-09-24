@@ -48,7 +48,10 @@ Welcome text
 
 # Agenda
 
-O czym w ogóle jest ta prezentacja
+- :white_large_square: Uruchomienie pierwszego kontenera
+- :white_large_square: Podstawowe pojęcia
+- :white_large_square: Konteneryzacja aplikacji backend
+- :white_large_square: Konteneryzacji aplikacji frontend
 
 ---
 
@@ -172,3 +175,12 @@ ENTRYPOINT ["dotnet", "dotnetapp.dll"]
 ---
 
 # Najlepsze praktyki pisania obrazów
+
+---
+
+# Podsumowanie
+
+- :white_check_mark: Uruchomienie pierwszego kontenera
+- :white_check_mark: Podstawowe pojęcia
+- :white_check_mark: Konteneryzacja aplikacji backend
+- :white_check_mark: Konteneryzacji aplikacji frontend
