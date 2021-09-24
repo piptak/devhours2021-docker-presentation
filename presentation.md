@@ -110,11 +110,28 @@ $ docker run -p 80:80 docker/getting-started
 
 # Architektura
 
-![architecture](https://docs.docker.com/engine/images/architecture.svg)
+![height:12em](https://docs.docker.com/engine/images/architecture.svg)
+https://docs.docker.com/get-started/overview/
 
 ---
 
-# Demo 2 Konteneryzacja aplikacji backend
+# Demo 2 Aplikacja backend - obraz
+
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /source
+
+COPY *.csproj .
+RUN dotnet restore
+
+COPY . .
+RUN dotnet publish -c release -o /app --no-restore
+
+FROM mcr.microsoft.com/dotnet/runtime:5.0
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "dotnetapp.dll"]
+```
 
 ---
 
