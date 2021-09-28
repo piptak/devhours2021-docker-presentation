@@ -135,10 +135,70 @@ WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "dotnetapp.dll"]
 ```
+<!-- 
+Kopiujemy podstawowy dockerfile znaleziony w przykładach dockera. 
+https://docs.docker.com/samples/dotnetcore/
+Musimy na początku zmienić nazwy na naszą aplikację i dodać osobno wszystkie projekty w ramach solucji które utworzyliśmy.  -->
+
+<!-- Robimy tak dlatego, że chcemy aby pobieranie zależności było w innej warstwie niż kopiowanie plików samej aplikacji i budowanie jej, ponieważ oznacza to że przy budowie obrazu będzie można użyć potwórnie warstwy z zależnościami jeśli zmienimy tylko aplikacji a nie nugety. -->
+
+<!-- Budujemy obraz z szablonu który napisaliśmy za pomocą komendy
+docker build -t devhours.cloudnative.api . -->
+
+<!-- Możemy teraz przetestować wszystko uruchamiając kontener z pomocą obrazu który stworzyliśmy wcześniej za pomocą komendy
+uruchamiamy docker run devhours.cloudnative.api -->
+
+<!-- Mamy błąd, że nie podano konfiguracji - musimy przekazać zmienną środowiskową ASPNETCORE_ENVIRONMENT aby załadować odpowiedni plik appsettings 
+docker run -e ASPNETCORE_ENVIRONMENT="Development" devhours.cloudnative.api -->
+
+<!-- teraz nie ma błędu, zanim jednak przejdziemy od razu dalej to czy można zmienić konfigurację, tak żeby zamiast ładować ją z pliku appsettings można podać zmienne środowiskowe?
+docker run -e Cors__AllowedOrigins__0="http://localhost:4200" devhours.cloudnative.api -->
+
+<!-- Super, udało się, natomiast dalej nie udostępniliśmy aplikacji na żadnych portach, spróbujmy więc to zrobić na :5000
+docker run -e Cors__AllowedOrigins__0="http://localhost:4200" -p 5000:80 devhours.cloudnative.api -->
 
 ---
 
-# Demo 3 Konteneryzacja aplikacji frontend
+# Demo 3 Aplikacja frontend - obraz
+
+```Dockerfile
+FROM node:10-alpine as builder
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+FROM nginx:1.16.0-alpine
+COPY --from=builder /react-frontend/build /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+<!-- Kopiujemy przykładowy dockerfile z artykułu w internecie https://dev.to/subhransu/nevertheless-subhransu-maharana-coded-5eam -->
+
+<!-- Ustawimy sobie inny katalog w którym będziemy pracować, zmienimy wersję noda do budowania na nowszą nginx tak samo -->
+
+<!-- Żeby to wszystko zadziałało potrzebujemy utworzyć sobie plik konfiguracyjny nxing który kopiujemy z internetu -->
+
+<!-- Potrzebujemy zmienić ścieżkę do kopiowania nginx -->
+
+<!-- Dodamy również plik dockerignore aby nie kopiować do obrazu niepotrzebnych rzeczy zajmujących miejsce i spowalniające cały proces wykonania -->
+
+<!-- Spróbujmy to wszystko zbudować za pomocą 
+docker build -t devhours.cloudnative.frontend . -->
+
+<!-- To byłoby prawie wszystko, ale musimy niestety podać jeszcze adres naszego api. Najłatwiej byłoby podać go w zmiennej środowiskowej tak samo jak konfigurowaliśmy backend. Nie jest to niestety tak proste jak tam, ponieważ adres jest zapisywany po prostu w pliku javascript przy tworzeniu obrazu dlatego musimy go podmienić w momencie uruchamiania kontenera. -->
+
+<!-- Żeby to zrobić dodajmy skrypt sh w którym podmienimy wskazaną wartość używając komendy sed.
+Musimy również dodać entrypoint do naszego dockerfile -->
+
+<!-- Zbudujmy nasz obraz
+docker build -t devhours.cloudnative.frontend .
+oraz spróbujmy uruchomić kontener
+docker run -e webapi="http://localhost:5000/api" -p 4200:80 devhours.cloudnative.frontend -->
 
 ---
 
