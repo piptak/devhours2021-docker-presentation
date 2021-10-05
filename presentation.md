@@ -46,10 +46,14 @@ footer: 'DevHours Docker | Piotr Ptak & Dawid Kolbusz | 09.10.2021'
 
 # Agenda
 
+- :white_large_square: Dlaczego docker? Podstawowe pojęcia oraz polecenia. Jak to działa? Wady. Najlepsze praktyki.
 - :white_large_square: Uruchomienie pierwszego kontenera
-- :white_large_square: Podstawowe pojęcia
 - :white_large_square: Konteneryzacja aplikacji backend
 - :white_large_square: Konteneryzacji aplikacji frontend
+- :white_large_square: Orchestracja. Docker compose
+- :white_large_square: Publikowanie obrazu
+- :white_large_square: Wdrożenie. ACI. CI/CD
+
 
 ---
 
@@ -294,7 +298,7 @@ docker run -e webapi="http://localhost:5000/api" -p 4200:80 devhours.cloudnative
 # Kilka słów o orchestracji
 
 * Orchestracja - proces konfigurowania i zarządzania komponentami takimi jak komunikacja, zmienne środowiskowe, storage 
-* docker-compose - narzędzie służące do orchestracji w środowisku docker
+* docker-compose - jedno z narzędzi służące do orchestracji w środowisku docker. Tworzy się go w języku yaml
 
 ---
 
@@ -337,6 +341,8 @@ volumes:
 
 # Struktura rejestru
 
+
+
 ![width:16em](https://docs.microsoft.com/pl-pl/azure/container-registry/media/container-registry-concepts/registry-elements.png)
 https://docs.microsoft.com/pl-pl/azure/container-registry/container-registry-concepts
 
@@ -364,8 +370,20 @@ az acr create --resource-group myResourceGroup \
 
 ## Azure Container Instances
 
-Usługa w chmurze Azure do uruchamiania skonteneryzowanych aplikacji dockerowych
+<style scoped>
+  p > img {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+</style>
+Usługa w chmurze Azure do uruchamiania skonteneryzowanych aplikacji dockerowych, nie wymagająca użycia wirtualnej maszyny.
+![](https://azure.microsoft.com/svghandler/container-instances?width=600&height=315)
 
+<!-- Benefity
+- usługa zarządzana przez Azure,
+- brak kosztów z góry,
+- naliczanie sekundowe -->
 ---
 
 # Demo 6 Wdrożenie do Azure
@@ -416,13 +434,23 @@ runs:
 
 # Najlepsze praktyki pisania obrazów
 
-https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+* Używaj dockerignore'a, 
+<!-- Pozowli Ci to zmniejszyć rozmiar obrazu i przyśpieszyć proces budowania i uruchamiania obrazu -->
+* Dziel obrazy względem odpowiedzialności,
+<!-- np. frontend, backend, baza osobno - ułatwi debugowanie i skalowanie -->
+* Używaj oficialnych obrazów
+<!-- Pozwoli Ci zaoszczędzić czas -->
+* Korzystaj z wieloetapowego budowania obrazów
+<!-- Obraz będzie lekki i wydajny -->
 
 ---
 
 # Podsumowanie
 
+- :white_check_mark: Dlaczego docker? Podstawowe pojęcia oraz polecenia. Jak to działa?
 - :white_check_mark: Uruchomienie pierwszego kontenera
-- :white_check_mark: Podstawowe pojęcia
 - :white_check_mark: Konteneryzacja aplikacji backend
 - :white_check_mark: Konteneryzacji aplikacji frontend
+- :white_check_mark: Orchestracja. Docker compose
+- :white_check_mark: Publikowanie obrazu
+- :white_check_mark: Wdrożenie. ACI. CI/CD
