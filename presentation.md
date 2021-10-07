@@ -304,21 +304,18 @@ docker run -e webapi="http://localhost:5000/api" -p 4200:80 devhours.cloudnative
 
 # Demo 4 docker compose
 
+docker-compose.yml
+
 ```yml
 version: "3.9"
 services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - logvolume01:/var/log
-    links:
-      - redis
   redis:
     image: redis
-volumes:
-  logvolume01: {}
+```
+polecenie:
+
+```sh
+$ docker-compose up
 ```
 
 <!-- przykład ze strony https://docs.docker.com/compose/ -->
@@ -351,17 +348,20 @@ https://docs.microsoft.com/pl-pl/azure/container-registry/container-registry-con
 # Demo 5 Opublikowanie obrazu
 
 ```sh
-$ docker login
+$ docker login --username login --password password
 $ docker tag <local-image> <registry>/<repository>/<image>:<version>
 $ docker push <registry>/<repository>/<image>:<version>
 ```
 
-### Opcjonalnie
+### Opcjonalnie Azure Container Registry
 
 ```sh
-az group create --name myResourceGroup --location eastus
-az acr create --resource-group myResourceGroup \
-  --name myContainerRegistry007 --sku Basic
+az group create --name myResourceGroup --location westeurope
+az acr create --location westeurope --name example-name \
+    --resource-group myResourceGroup --sku Standard
+az acr login -n example-name
+docker tag image example-name.azurecr.io/image
+docker push example-name.azurecr.io/image
 ```
 
 ---
@@ -378,23 +378,26 @@ az acr create --resource-group myResourceGroup \
   }
 </style>
 Usługa w chmurze Azure do uruchamiania skonteneryzowanych aplikacji dockerowych, nie wymagająca użycia wirtualnej maszyny.
-![](https://azure.microsoft.com/svghandler/container-instances?width=600&height=315)
+
+Link do utworzonej aplikacji: `http://<dns-name>.<region>.azurecontainer.io`
 
 <!-- Benefity
 - usługa zarządzana przez Azure,
 - brak kosztów z góry,
-- naliczanie sekundowe -->
+- naliczanie sekundowe
+- łatwe uruchomienie kontenerów -->
 ---
 
 # Demo 6 Wdrożenie do Azure
 
 ```sh
-az container create \ 
-  --resource-group myResourceGroup \
-  --name mycontainer \
-  --image mcr.microsoft.com/azuredocs/aci-helloworld \
-  --dns-name-label aci-demo \
-  --ports 80
+az container create \
+    --resource-group test-rg \
+    --name aci-name \
+    --image docker-image-name \
+    --dns-name-label dns-name \
+    --ports 80 \
+    --environment-variables 'example_variable'='example_value'
 ```
 
 ---
@@ -402,29 +405,47 @@ az container create \
 # CI/CD
 
 
+---
+
+# Demo 7 CI/CD - przygotowanie
+
+1. Token do DockerHub
+2. Użytkownik do deploymentu Azure
+```sh
+az ad sp create-for-rbac \ 
+  --name "user-name" \
+  --role contributor \
+  --scopes /subscriptions/<subscriptionId>/resourceGroups/<resourceGroup> \
+  --sdk-auth
+```
+
+<!-- Najpierw utworzyć token po zalogowaniu się na swój profil w dockerhub a następnie zapisać ten token w github secrets -->
+
+<!-- Następnie za pomocą komendy utworzyć użytkownika który może zrobić deployment i otrzymanego jsona zapisać w github secrets -->
 
 ---
 
-# Demo 7 CI/CD
+# Demo 7 CI/CD - Github Actions
 
 ```yaml
-# action.yml
-name: 'Hello World'
-description: 'Greet someone and record the time'
-inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 ```
+
+<!-- Do pushowania do docker huba użyć akcji docker/login-action@v1 -->
+
+<!-- Do deploymentu azure użyć najpierw akcji azure/login@v1 a potem Azure/aci-deploy@v1 - wszystko opisane na https://github.com/marketplace/actions/deploy-to-azure-container-instances -->
 
 ---
 
@@ -438,7 +459,7 @@ runs:
 <!-- Pozowli Ci to zmniejszyć rozmiar obrazu i przyśpieszyć proces budowania i uruchamiania obrazu -->
 * Dziel obrazy względem odpowiedzialności,
 <!-- np. frontend, backend, baza osobno - ułatwi debugowanie i skalowanie -->
-* Używaj oficialnych obrazów
+* Używaj oficjalnych obrazów
 <!-- Pozwoli Ci zaoszczędzić czas -->
 * Korzystaj z wieloetapowego budowania obrazów
 <!-- Obraz będzie lekki i wydajny -->
