@@ -74,23 +74,9 @@ footer: 'DevHours Docker | Piotr Ptak & Dawid Kolbusz | 09.10.2021'
 
 # Wprowadzenie
 
-<style scoped>
-  p > img {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-  }
-  p > a {
-    font-size: 0.3em;
-  }
-  p:nth-of-type(1) {
-    text-align: center;
-  }
-</style>
-
-![height:8em](https://res.cloudinary.com/practicaldev/image/fetch/s--08z6gIzC--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://thepracticaldev.s3.amazonaws.com/i/l9w3sg7lfal6o0ewhxht.jpg) https://dev.to/kelvin0712/junior-dev-my-experiences-during-my-first-job-as-a-developer-17b2
-
-Opowiemy wam hostorię Janka, który zatrudnił się w firmie jako junior developer i otrzymał zadanie konteneryzacji aplikacji
+* Bazą na której będziemy pracować są zrobione wcześniej aplikacje frontend i api
+* https://github.com/JaroslawParadysz/DevHours.CloudNative.Api
+* https://github.com/JaroslawParadysz/DevHours.CloudNative.Frontend
 
 ---
 
@@ -320,6 +306,29 @@ $ docker-compose up
 
 <!-- przykład ze strony https://docs.docker.com/compose/ -->
 
+
+<!-- version: "3.9"
+services:
+    api:
+        image: devhours.cloudnative.api
+        ports:
+            - "5000:80"
+        environment:
+            Cors__AllowedOrigins__0: "http://localhost:4200"
+            ConnectionStrings__HotelDbConnection: "User ID=postgres;Password=example;Host=db;Port=5432;Database=myDataBase;"
+        depends_on: 
+            - db
+    frontend:
+        image:  devhours.cloudnative.frontend
+        ports:
+            - "4200:80"
+        environment:
+            webapi: "http://localhost:5000/api"
+    db:
+        image: postgres
+        environment:
+            POSTGRES_PASSWORD: example -->
+
 ---
 
 <style scoped>
@@ -338,8 +347,6 @@ $ docker-compose up
 
 # Struktura rejestru
 
-
-
 ![width:16em](https://docs.microsoft.com/pl-pl/azure/container-registry/media/container-registry-concepts/registry-elements.png)
 https://docs.microsoft.com/pl-pl/azure/container-registry/container-registry-concepts
 
@@ -352,6 +359,12 @@ $ docker login --username login --password password
 $ docker tag <local-image> <registry>/<repository>/<image>:<version>
 $ docker push <registry>/<repository>/<image>:<version>
 ```
+
+<!-- docker tag devhours.cloudnative.api piptak/devhours.cloudnative.api:1.0.0
+docker push piptak/devhours.cloudnative.api:1.0.0 -->
+
+<!-- docker tag devhours.cloudnative.frontend piptak/devhours.cloudnative.frontend:1.0.0
+docker push piptak/devhours.cloudnative.frontend:1.0.0 -->
 
 ### Opcjonalnie Azure Container Registry
 
@@ -400,10 +413,27 @@ az container create \
     --environment-variables 'example_variable'='example_value'
 ```
 
+<!-- az container create \
+    --resource-group dev-hours-test \
+    --name dev-hours-api \
+    --image piptak/devhours.cloudnative.api \
+    --dns-name-label dev-hours-api \
+	--ports 80 \
+    --environment-variables 'Cors__AllowedOrigins__0'='http://dev-hours-frontend.westeurope.azurecontainer.io' -->
+
+<!-- az container create \
+    --resource-group dev-hours-test \
+    --name dev-hours-frontend \
+    --image piptak/devhours.cloudnative.frontend \
+    --dns-name-label dev-hours-frontend \
+	--ports 80 \
+    --environment-variables 'webapi'='http://dev-hours-api.westeurope.azurecontainer.io/api' -->
+
 ---
 
 # CI/CD
 
+![height:8em](./ci-cd.png)
 
 ---
 
@@ -451,6 +481,22 @@ jobs:
 
 # Wady docker
 
+* Kolejna warstwa zależności i technologia do nauczenia dla developerów
+* Problemy z zarządzniem i monitorowaniem dużej ilości kontenerów
+* Problemy z data storagem
+* Nie wszystkie aplikacje osiągają korzyści z dockera
+* Bezpieczeństwo
+
+<!-- Kolejne narzędzie do nauczenia i do potencjalnego debuggowania jeśli coś nie działa przy tworzeniu aplikacji -->
+
+<!-- Sam docker nie oferuje zbyt dobrych narzędzi trzeba korzystać z orchestratorów takich jak docker-compose czy kubernetes a one dodają dodatkową złożoność -->
+
+<!-- Podpięcie trwałego źródła zapisu do kontenera jest problematyczne, docker data volume jest jakimś rozwiązaniem ale ma problemy z wydajnością -->
+
+<!-- Docker nie będzie zbyt dobrym rozwiązaniem dla wszystkich aplikacji - świetnie nada się do mikroserwisów z wyraźnie oddzieloną odpowiedzialnością ale w przypadku monolitu lub baz danych może być bardzo mało przydatny -->
+
+<!-- Oprócz konieczności zabezpieczenia aplikacji, ważne jest bezpieczeństwo kontenera w którym pracuje, ważne jest skanowanie i używanie oficjalnych obrazów -->
+
 ---
 
 # Najlepsze praktyki pisania obrazów
@@ -461,6 +507,8 @@ jobs:
 <!-- np. frontend, backend, baza osobno - ułatwi debugowanie i skalowanie -->
 * Używaj oficjalnych obrazów
 <!-- Pozwoli Ci zaoszczędzić czas -->
+* Używaj konkretnych wersji obrazów zamiast latest
+<!-- Unikniesz błędów z nieprzewidzianymi zmianami api i błędami w aplikacji -->
 * Korzystaj z wieloetapowego budowania obrazów
 <!-- Obraz będzie lekki i wydajny -->
 
@@ -475,3 +523,17 @@ jobs:
 - :white_check_mark: Orchestracja. Docker compose
 - :white_check_mark: Publikowanie obrazu
 - :white_check_mark: Wdrożenie. ACI. CI/CD
+
+---
+
+# Linki
+
+* Prezentacja - github.com/piptak/devhours2021-docker-presentation
+* API - github.com/piptak/DevHours.CloudNative.Api
+* Frontend - github.com/piptak/DevHours.CloudNative.Frontend
+
+---
+
+# Pytania
+
+## Serdecznie zapraszamy do zadawania pytań
